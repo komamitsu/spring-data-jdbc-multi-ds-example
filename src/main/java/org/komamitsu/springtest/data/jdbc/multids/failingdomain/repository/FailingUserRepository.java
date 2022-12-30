@@ -5,7 +5,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(transactionManager = "failingTransactionManager")
+@Transactional
 @Repository
 public interface FailingUserRepository extends PagingAndSortingRepository<User, String> {
 }

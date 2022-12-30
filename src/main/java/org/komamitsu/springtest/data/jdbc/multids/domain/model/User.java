@@ -5,13 +5,21 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table
 public class User {
-  @Id
-  public Integer id;
+    @Id
+    public Integer id;
 
-  public String name;
+    public String name;
 
-  public User(Integer id, String name) {
-    this.id = id;
-    this.name = name;
-  }
+    public User(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
