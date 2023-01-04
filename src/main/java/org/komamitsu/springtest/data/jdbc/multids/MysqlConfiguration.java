@@ -1,6 +1,5 @@
 package org.komamitsu.springtest.data.jdbc.multids;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,36 +14,36 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-@EnableJdbcRepositories(basePackages = "org.komamitsu.springtest.data.jdbc.multids.failingdomain",
-        transactionManagerRef = "failingTransactionManager",
-        jdbcOperationsRef = "failingNamedParameterJdbcOperations"
+@EnableJdbcRepositories(basePackages = "org.komamitsu.springtest.data.jdbc.multids.domain.repository.mysql",
+    transactionManagerRef = "mysqlTransactionManager",
+    jdbcOperationsRef = "mysqlNamedParameterJdbcOperations"
 )
-public class FailingConfiguration {
+public class MysqlConfiguration {
     @Bean
-    @ConfigurationProperties("spring.datasource.failing")
-    public DataSourceProperties failingDataSourceProperties() {
+    @ConfigurationProperties("spring.datasource.mysql")
+    DataSourceProperties mysqlDataSourceProperties() {
         return new DataSourceProperties();
     }
 
     @Bean
-    public DataSource failingDataSource() {
-        return failingDataSourceProperties()
+    public DataSource mysqlDataSource() {
+        return mysqlDataSourceProperties()
                 .initializeDataSourceBuilder()
                 .build();
     }
 
     @Bean
-    public JdbcTemplate failingJdbcTemplate() {
-        return new JdbcTemplate(failingDataSource());
+    public JdbcTemplate mysqlJdbcTemplate() {
+        return new JdbcTemplate(mysqlDataSource());
     }
 
     @Bean
-    public NamedParameterJdbcOperations failingNamedParameterJdbcOperations() {
-        return new NamedParameterJdbcTemplate(failingDataSource());
+    public NamedParameterJdbcOperations mysqlNamedParameterJdbcOperations() {
+        return new NamedParameterJdbcTemplate(mysqlDataSource());
     }
 
     @Bean
-    public PlatformTransactionManager failingTransactionManager() {
-        return new JdbcTransactionManager(failingDataSource());
+    public PlatformTransactionManager mysqlTransactionManager() {
+        return new JdbcTransactionManager(mysqlDataSource());
     }
 }

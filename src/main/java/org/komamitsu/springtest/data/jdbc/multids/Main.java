@@ -1,8 +1,10 @@
 package org.komamitsu.springtest.data.jdbc.multids;
 
-import org.komamitsu.springtest.data.jdbc.multids.defaultdomain.repository.UserRepository;
+import java.util.Iterator;
+import java.util.List;
+import org.komamitsu.springtest.data.jdbc.multids.domain.repository.postgresql.PostgresqlUserRepository;
 import org.komamitsu.springtest.data.jdbc.multids.domain.model.User;
-import org.komamitsu.springtest.data.jdbc.multids.failingdomain.repository.FailingUserRepository;
+import org.komamitsu.springtest.data.jdbc.multids.domain.repository.mysql.MysqlUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,22 +25,34 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     @Autowired
-    @Qualifier("defaultJdbcTemplate")
-    JdbcTemplate template;
+    @Qualifier("postgresqlJdbcTemplate")
+    JdbcTemplate postgresqlTemplate;
 
     @Autowired
-    UserRepository repository;
+    @Qualifier("mysqlJdbcTemplate")
+    JdbcTemplate mysqlTemplate;
 
     @Autowired
-    FailingUserRepository failingRepository;
+    PostgresqlUserRepository postgresqlRepository;
+
+    @Autowired
+    MysqlUserRepository mysqlRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
 
     private void setUpSchema() throws IOException {
-        ClassPathResource resource = new ClassPathResource("pg-schema.sql");
-        Files.readAllLines(Paths.get(resource.getURI())).forEach(ddl -> template.execute(ddl));
+        {
+            ClassPathResource resource = new ClassPathResource("pg-schema.sql");
+            Files.readAllLines(Paths.get(resource.getURI()))
+                .forEach(ddl -> postgresqlTemplate.execute(ddl));
+        }
+        {
+            ClassPathResource resource = new ClassPathResource("mysql-schema.sql");
+            Files.readAllLines(Paths.get(resource.getURI()))
+                .forEach(ddl -> mysqlTemplate.execute(ddl));
+        }
     }
 
     @Bean
@@ -46,16 +60,35 @@ public class Main {
         return (String[] args) -> {
             setUpSchema();
 
-            repository.save(new User(null, "komamitsu"));
+            String postgresqlUserName = "postgresql";
+            String mysqlUserName = "mysql";
 
-            try {
-                failingRepository.save(new User(null, "should_fail"));
-                throw new AssertionError("Should fail");
-            } catch (Exception e) {
-                // Expected
+            postgresqlRepository.save(new User(null, postgresqlUserName));
+            mysqlRepository.save(new User(null, mysqlUserName));
+
+            {
+                Iterator<User> iterator = postgresqlRepository.findAll().iterator();
+                String name = iterator.next().name;
+                if (!name.equals(postgresqlUserName)) {
+                    throw new AssertionError(
+                        String.format("Expected user:%s stored in PostgreSQL datasource, but got user:%s", postgresqlUserName, name));
+                }
+                if (iterator.hasNext()) {
+                    throw new AssertionError("PostgreSQL datasource has multiple records unexpectedly");
+                }
             }
 
-            System.out.println(repository.findAll());
+            {
+                Iterator<User> iterator = mysqlRepository.findAll().iterator();
+                String name = iterator.next().name;
+                if (!name.equals(mysqlUserName)) {
+                    throw new AssertionError(
+                        String.format("Expected user:%s stored in MySQL datasource, but got user:%s", mysqlUserName, name));
+                }
+                if (iterator.hasNext()) {
+                    throw new AssertionError("MySQL datasource has multiple records unexpectedly");
+                }
+            }
         };
     }
 }

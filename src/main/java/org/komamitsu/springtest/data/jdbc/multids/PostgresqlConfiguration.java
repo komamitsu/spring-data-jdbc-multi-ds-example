@@ -1,7 +1,6 @@
 package org.komamitsu.springtest.data.jdbc.multids;
 
-import org.komamitsu.springtest.data.jdbc.multids.defaultdomain.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.komamitsu.springtest.data.jdbc.multids.domain.repository.postgresql.PostgresqlUserRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,38 +18,39 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableJdbcRepositories(
-        basePackages = "org.komamitsu.springtest.data.jdbc.multids.defaultdomain",
-        jdbcOperationsRef = "defaultNamedParameterJdbcOperations"
+    basePackages = "org.komamitsu.springtest.data.jdbc.multids.domain.repository.postgresql",
+    transactionManagerRef = "postgresqlTransactionManager",
+    jdbcOperationsRef = "postgresqlNamedParameterJdbcOperations"
 )
-@ConditionalOnMissingBean(UserRepository.class)
-public class DefaultConfiguration {
+@ConditionalOnMissingBean(PostgresqlUserRepository.class)
+public class PostgresqlConfiguration {
     @Bean
-    @ConfigurationProperties("spring.datasource.default")
-    public DataSourceProperties defaultDataSourceProperties() {
+    @ConfigurationProperties("spring.datasource.postgresql")
+    public DataSourceProperties postgresqlDataSourceProperties() {
         return new DataSourceProperties();
     }
 
     @Bean
     @Primary
-    public DataSource defaultDataSource() {
-        return defaultDataSourceProperties()
+    public DataSource postgresqlDataSource() {
+        return postgresqlDataSourceProperties()
                 .initializeDataSourceBuilder()
                 .build();
     }
 
     @Bean
-    public JdbcTemplate defaultJdbcTemplate() {
-        return new JdbcTemplate(defaultDataSource());
+    public JdbcTemplate postgresqlJdbcTemplate() {
+        return new JdbcTemplate(postgresqlDataSource());
     }
 
     @Bean
     @Primary
-    public NamedParameterJdbcOperations defaultNamedParameterJdbcOperations() {
-        return new NamedParameterJdbcTemplate(defaultDataSource());
+    public NamedParameterJdbcOperations postgresqlNamedParameterJdbcOperations() {
+        return new NamedParameterJdbcTemplate(postgresqlDataSource());
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager() {
-        return new JdbcTransactionManager(defaultDataSource());
+    public PlatformTransactionManager postgresqlTransactionManager() {
+        return new JdbcTransactionManager(postgresqlDataSource());
     }
 }
