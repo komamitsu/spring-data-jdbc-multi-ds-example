@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableJdbcRepositories(
-        basePackages = "org.komamitsu.springtest.data.jdbc.multids.defaultdomain.repository",
+        basePackages = "org.komamitsu.springtest.data.jdbc.multids.defaultdomain",
         jdbcOperationsRef = "defaultNamedParameterJdbcOperations"
 )
 @ConditionalOnMissingBean(UserRepository.class)
