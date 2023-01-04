@@ -1,2 +1,2 @@
-create table if not exists "user" (id serial primary key, name text);
-delete from "user";
+create table if not exists player (id serial primary key, name text);
+delete from player;

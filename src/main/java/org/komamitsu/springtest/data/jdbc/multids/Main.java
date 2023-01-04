@@ -1,10 +1,9 @@
 package org.komamitsu.springtest.data.jdbc.multids;
 
 import java.util.Iterator;
-import java.util.List;
-import org.komamitsu.springtest.data.jdbc.multids.domain.repository.postgresql.PostgresqlUserRepository;
-import org.komamitsu.springtest.data.jdbc.multids.domain.model.User;
-import org.komamitsu.springtest.data.jdbc.multids.domain.repository.mysql.MysqlUserRepository;
+import org.komamitsu.springtest.data.jdbc.multids.domain.repository.postgresql.PostgresqlPlayerRepository;
+import org.komamitsu.springtest.data.jdbc.multids.domain.model.Player;
+import org.komamitsu.springtest.data.jdbc.multids.domain.repository.mysql.MysqlPlayerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +32,10 @@ public class Main {
     JdbcTemplate mysqlTemplate;
 
     @Autowired
-    PostgresqlUserRepository postgresqlRepository;
+    PostgresqlPlayerRepository postgresqlRepository;
 
     @Autowired
-    MysqlUserRepository mysqlRepository;
+    MysqlPlayerRepository mysqlRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
@@ -63,15 +62,15 @@ public class Main {
             String postgresqlUserName = "postgresql";
             String mysqlUserName = "mysql";
 
-            postgresqlRepository.save(new User(null, postgresqlUserName));
-            mysqlRepository.save(new User(null, mysqlUserName));
+            postgresqlRepository.save(new Player(null, postgresqlUserName));
+            mysqlRepository.save(new Player(null, mysqlUserName));
 
             {
-                Iterator<User> iterator = postgresqlRepository.findAll().iterator();
+                Iterator<Player> iterator = postgresqlRepository.findAll().iterator();
                 String name = iterator.next().name;
                 if (!name.equals(postgresqlUserName)) {
                     throw new AssertionError(
-                        String.format("Expected user:%s stored in PostgreSQL datasource, but got user:%s", postgresqlUserName, name));
+                        String.format("Expected %s stored in PostgreSQL datasource, but got %s", postgresqlUserName, name));
                 }
                 if (iterator.hasNext()) {
                     throw new AssertionError("PostgreSQL datasource has multiple records unexpectedly");
@@ -79,11 +78,11 @@ public class Main {
             }
 
             {
-                Iterator<User> iterator = mysqlRepository.findAll().iterator();
+                Iterator<Player> iterator = mysqlRepository.findAll().iterator();
                 String name = iterator.next().name;
                 if (!name.equals(mysqlUserName)) {
                     throw new AssertionError(
-                        String.format("Expected user:%s stored in MySQL datasource, but got user:%s", mysqlUserName, name));
+                        String.format("Expected %s stored in MySQL datasource, but got %s", mysqlUserName, name));
                 }
                 if (iterator.hasNext()) {
                     throw new AssertionError("MySQL datasource has multiple records unexpectedly");
