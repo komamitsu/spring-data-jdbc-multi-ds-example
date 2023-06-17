@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("application")
 }
 
 group = "org.komamitsu.springtest.data.jdbc.multids"
@@ -19,4 +20,8 @@ dependencies {
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
+}
+
+application {
+    mainClass.set("org.komamitsu.springtest.data.jdbc.multids.Main")
 }
